@@ -80,8 +80,8 @@ def makeVideo(imageFolderPath, inputFPS):
     subprocess.call(cmdstr, shell=True)
 
     # clean up all the intermediate files (watermarked frames)
-    #cmdstr = 'rm frame-*'
-    #subprocess.call(cmdstr, shell=True)
+    cmdstr = 'rm frame-*'
+    subprocess.call(cmdstr, shell=True)
     
     os.chdir(olddir)
     return
@@ -89,24 +89,28 @@ def makeVideo(imageFolderPath, inputFPS):
 if __name__ == "__main__":
     
     ''' Specify configurable parameters '''
-    subject_name = 'Recycling_comparison'
-    image_dir = '/home/james/Code/P4/images/raw/' + subject_name
-    macro_name = 'recycling_comparison'
+    #subject_name = 'SV1_Drought_responsive'
+    #macro_name = 'sv1'
+    subject_name = 'SV2_Recycling_comparison'
+    macro_name = 'sv2'
      
+    image_dir = '/home/james/Code/P4/images/raw/' + subject_name
+     
+      
     ''' Parse list of matching filenames for original images '''
     os.chdir(image_dir)
     image_files = []
     for x in os.listdir():
         if not os.path.isdir(x) and x[:len(subject_name)] == subject_name:
             image_files.append(x)
-      
+        
     ''' Create output directory for processed images '''
     os.chdir('../../processed')
     cmd = 'mkdir -p ' + subject_name
     subprocess.call(cmd, shell=True)
     os.chdir(subject_name)
     output_dir = os.getcwd()
-      
+        
     ''' Call ImageJ macro(s) '''
     ij_jar_path = '/usr/local/ImageJ/ij.jar'
     macros_path = '/home/james/Code/P4/batch_macros.ijm'
@@ -114,12 +118,16 @@ if __name__ == "__main__":
     callBatchMacro(ij_jar_path, image_dir, output_dir, macros_path, macro_name)
     end = time.time()
     #print(end-start)
-     
+       
     ''' Extract timestamps from image filenames and add to images '''
     timestampImageFolder(output_dir)
-     
+      
     ''' Concatenate frames into a video file '''
     makeVideo(output_dir, 4)
+    
+    #import os
+    #os.chdir("/home/james/Code/P4/images/raw/SV2_Recycling_comparison")
+    #[os.rename(f, f.replace('RecyclingComparison', 'SV2_Recycling_comparison')) for f in os.listdir('.') if not f.startswith('.')]
     
     print("\nDone!")
     
